@@ -1,0 +1,10 @@
+@import './base.css';
+@import 'bootstrap/dist/css/bootstrap.css';
+
+body {
+  background-color: #f0f0f0;
+}
+
+#app {
+  background-color: white;
+}
