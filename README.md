@@ -1,4 +1,4 @@
-# heure-champs
+# Agri Chrono
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -42,6 +42,14 @@ npm run test:unit
 
 ```sh
 npm run lint
+```
+
+### Production build
+
+To create a production build, you will only have to create a `.env.production` file that will contain the main URL for your production API
+
+```
+VITE_API_URL=https://api.example.com:5000
 ```
 
 ## Build Android application
