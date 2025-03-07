@@ -7,6 +7,11 @@ import type Confirm from '@/utils/Confirm'
 import LoadingModal from '@/components/LoadingModal.vue'
 import type Plot from '@/utils/Plot'
 import { ref } from 'vue'
+import { BIconChevronBarExpand, BIconFiletypeCsv } from 'bootstrap-icons-vue'
+import { dateFormatter } from '@/composables/dateFormatter'
+import { Capacitor } from '@capacitor/core'
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
+import { FileOpener, type FileOpenerOptions } from '@capacitor-community/file-opener'
 
 const { farms, assignments, deleteAssignment, loadSettings } = useSettings()
 
@@ -70,36 +75,150 @@ const confirmDialog = (item: Confirm) => {
       })
   }
 }
+
+const exportCSV = () => {
+  const sorted = assignments.value.sort((a, b) => (a.date < b.date ? 1 : -1))
+  const headers = [
+    'Date',
+    'Chauffeur',
+    'Type',
+    'Parcelle',
+    'Tâche',
+    "Nombre d'heures",
+    'Nombre de tours',
+  ].join(';')
+  const csv = sorted.map((a) => {
+    return [
+      dateFormatter().format(a.date),
+      a.worker.name,
+      getHumanReadableType(a.type),
+      a.plot ? getPlotName(a.plot) : '',
+      a.task ? a.task.name : '',
+      a.time.toFixed(2),
+      a.value?.toFixed(0) ?? '',
+    ].join(';')
+  })
+
+  if (Capacitor.isNativePlatform()) {
+    exportNative(headers, csv.join('\n'))
+  } else {
+    exportWeb(headers, csv.join('\n'))
+  }
+}
+
+const exportNative = async (headers: string, data: string) => {
+  const ok = await getFilesystemAccess()
+  if (!ok) return
+
+  const result = await Filesystem.writeFile({
+    path: 'export.csv',
+    data: headers + '\n' + data,
+    directory: Directory.Documents,
+    encoding: Encoding.UTF8,
+  })
+  const successToast = document.getElementById('successToast')
+  successToast!.querySelector('.toast-body')!.textContent = result.uri
+  const toastBootstrap = Toast.getOrCreateInstance(successToast!)
+  toastBootstrap.show()
+
+  const fileOpenerOptions: FileOpenerOptions = {
+    filePath: result.uri,
+    contentType: 'text/csv',
+    openWithDefault: true,
+  }
+  await FileOpener.open(fileOpenerOptions)
+}
+
+const getFilesystemAccess = () => {
+  return new Promise(async (resolve) => {
+    const status = await Filesystem.checkPermissions()
+    const state = status.publicStorage
+
+    if (state === 'granted') {
+      return resolve(true)
+    } else if (state === 'denied') {
+      // You make want to redirect to the main app settings.
+    } else {
+      const requestResult = await Filesystem.requestPermissions()
+      if (requestResult.publicStorage === 'granted') {
+        return resolve(true)
+      }
+    }
+    return resolve(false)
+  })
+}
+
+const exportWeb = (headers: string, data: string) => {
+  const csvContent = 'data:text/csv;charset=utf-8,' + headers + '\n' + data
+  const encodedUri = encodeURI(csvContent)
+  const link = document.createElement('a')
+  link.setAttribute('href', encodedUri)
+  link.download = 'export.csv'
+  link.target = 'blank'
+  link.click()
+  link.remove()
+}
 </script>
 
 <template>
   <LoadingModal />
   <ConfirmModal :item="confirm" @confirm="confirmDialog" @close="() => {}" />
   <div class="p-4 table-responsive">
+    <button class="btn btn-primary" @click="exportCSV">
+      <BIconFiletypeCsv class="me-2" />Exporter CSV
+    </button>
     <table class="table table-hover">
       <thead>
         <tr>
+          <th class="d-table-cell d-sm-none" scope="col"></th>
           <th scope="col">Chauffeur</th>
-          <th scope="col">Type</th>
+          <th class="d-none d-sm-table-cell" scope="col">Type</th>
           <th scope="col">Parcelle</th>
-          <th scope="col">Tâche</th>
-          <th scope="col">Nombre d'heures</th>
-          <th scope="col">Nombre de tours</th>
+          <th class="d-none d-sm-table-cell" scope="col">Tâche</th>
+          <th class="d-none d-sm-table-cell" scope="col">Nombre d'heures</th>
+          <th class="d-none d-sm-table-cell" scope="col">Nombre de tours</th>
           <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="a in assignments.sort((a, b) => (a.date < b.date ? 1 : -1))" :key="a.id">
-          <th scope="row">{{ a.worker.name }}</th>
-          <td>{{ getHumanReadableType(a.type) }}</td>
-          <td>{{ a.plot ? getPlotName(a.plot) : '-' }}</td>
-          <td>{{ a.task ? a.task.name : '-' }}</td>
-          <td>{{ a.time.toFixed(2) }}h</td>
-          <td>{{ a.value?.toFixed(0) ?? '-' }}</td>
-          <td>
-            <BIconTrash3 role="button" @click="confirmDeleteAssignment(a)"></BIconTrash3>
-          </td>
-        </tr>
+        <template v-for="a in assignments.sort((a, b) => (a.date < b.date ? 1 : -1))" :key="a.id">
+          <tr class="align-middle">
+            <td
+              class="d-table-cell d-sm-none accordion-toggle collapsed text-center"
+              data-bs-toggle="collapse"
+              :href="'#expanded' + a.id"
+              role="button"
+              aria-expanded="false"
+              :aria-controls="'#expanded' + a.id"
+            >
+              <BIconChevronBarExpand />
+            </td>
+            <td>
+              {{ a.worker.name }}
+            </td>
+            <td class="d-none d-sm-table-cell">{{ getHumanReadableType(a.type) }}</td>
+            <td>
+              {{ a.plot ? getPlotName(a.plot) : '-' }}
+            </td>
+            <td class="d-none d-sm-table-cell">{{ a.task ? a.task.name : '-' }}</td>
+            <td class="d-none d-sm-table-cell">{{ a.time.toFixed(2) }}h</td>
+            <td class="d-none d-sm-table-cell">{{ a.value?.toFixed(0) ?? '-' }}</td>
+            <td>
+              <BIconTrash3 role="button" @click="confirmDeleteAssignment(a)"></BIconTrash3>
+            </td>
+          </tr>
+          <tr>
+            <td class="p-0" colspan="6">
+              <div :id="'expanded' + a.id" class="collapse p-2">
+                Date: {{ dateFormatter().format(a.date) }}<br />
+                Type: {{ getHumanReadableType(a.type) }} <br />
+                Tâche: {{ a.task ? a.task.name : '-' }}<br />
+                Nombre d'heures: {{ a.time.toFixed(2) }}h<br />
+                Nombre de tours: {{ a.value?.toFixed(0) ?? '-' }}<br />
+              </div>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
