@@ -43,3 +43,25 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+## Build Android application
+
+For more information, see [Capacitor documentation](https://capacitorjs.com/docs/android)
+
+### Add android project
+
+```sh
+npx cap add android
+```
+
+### Synchronise sources to the android project
+
+```sh
+npx cap sync android
+```
+
+### Run android application
+
+```sh
+npx cap run android
+```
