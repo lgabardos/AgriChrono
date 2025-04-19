@@ -63,7 +63,7 @@ const isValid = computed(() => {
     case AssignmentType.OTHER:
       return !!selectWorker.value && time.value > 0
     case AssignmentType.SLURRY:
-      return !!selectPlot.value && !!selectWorker.value && time.value > 0 && value.value > 0
+      return !!selectPlot.value && !!selectWorker.value && value.value > 0
   }
   return false
 })
