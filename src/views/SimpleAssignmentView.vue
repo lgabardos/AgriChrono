@@ -3,6 +3,7 @@ import LoadingModal from '@/components/LoadingModal.vue'
 import { useSettings } from '@/store/settings'
 import Assignment, { AssignmentType } from '@/utils/Assignment'
 import Driver from '@/utils/Driver'
+import type Farm from '@/utils/Farm'
 import Plot from '@/utils/Plot'
 import Task from '@/utils/Task'
 import { Modal, Toast } from 'bootstrap'
@@ -15,6 +16,7 @@ const assignmentType = ref<string>()
 const editAssignment = ref(
   new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.OTHER, 0),
 )
+const selectFarm = ref<Farm>()
 const selectPlot = ref<Plot>()
 const selectWorker = ref<Driver>()
 const selectTask = ref<Task>()
@@ -26,6 +28,10 @@ const setType = (type: AssignmentType) => {
   editAssignment.value.type = type
 }
 
+const setFarm = (e: EventTarget | null) => {
+  const idFarm = e ? parseInt((e as HTMLInputElement).value) : 0
+  selectFarm.value = farms.value.find((f) => f.id === idFarm) ?? farms.value[0]
+}
 const setPlot = (e: EventTarget | null) => {
   const idPlot = e ? parseInt((e as HTMLInputElement).value) : 0
   selectPlot.value = plots.value.find((d) => d.id === idPlot) ?? plots.value[0]
@@ -182,11 +188,20 @@ const save = () => {
       </h3>
     </div>
     <div v-if="plotVisible" class="mb-3">
+      <label for="selectFarm" class="form-label">Exploitations</label>
+      <select class="form-control" id="selectFarm" @change="setFarm($event.target)">
+        <option value="0" selected disabled>--- Sélectionnez une exploitation ---</option>
+        <option v-for="farm in farms" :key="farm.id" :value="farm.id">
+          {{ farm.name }}
+        </option>
+      </select>
+    </div>
+    <div v-if="plotVisible" class="mb-3">
       <label for="selectPlot" class="form-label">Parcelle</label>
-      <select class="form-control" id="selectPlot" @change="setPlot($event.target)">
+      <select class="form-control" id="selectPlot" @change="setPlot($event.target)" :disabled="selectFarm === undefined">
         <option value="0" selected disabled>--- Sélectionnez une parcelle ---</option>
-        <option v-for="plot in plots" :key="plot.id" :value="plot.id">
-          {{ farms.find((f) => f.id === plot.idFarm)?.name ?? '-' }} / {{ plot.name }}
+        <option v-for="plot in plots.filter(p => p.idFarm === selectFarm?.id)" :key="plot.id" :value="plot.id">
+          {{ plot.name }}
         </option>
       </select>
     </div>
