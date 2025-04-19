@@ -64,6 +64,8 @@ const isValid = computed(() => {
       return !!selectWorker.value && time.value > 0
     case AssignmentType.SLURRY:
       return !!selectPlot.value && !!selectWorker.value && value.value > 0
+    case AssignmentType.DIGESTATE:
+      return !!selectPlot.value && !!selectWorker.value && value.value > 0
   }
   return false
 })
@@ -76,23 +78,27 @@ const typeTitle = computed(() => {
     case AssignmentType.OTHER:
       return 'Autre'
     case AssignmentType.SLURRY:
-      return 'Lisier / Digestat'
+      return 'Lisier'
+    case AssignmentType.DIGESTATE:
+      return 'Digestat'
   }
   return ''
 })
 const plotVisible = computed(
   () =>
     assignmentType.value === AssignmentType.CULTURE ||
-    assignmentType.value === AssignmentType.SLURRY,
+    assignmentType.value === AssignmentType.SLURRY ||
+    assignmentType.value === AssignmentType.DIGESTATE,
 )
 const taskVisible = computed(() => assignmentType.value === AssignmentType.CULTURE)
 const timeVisible = computed(
   () =>
     assignmentType.value === AssignmentType.METHA ||
     assignmentType.value === AssignmentType.OTHER ||
-    assignmentType.value === AssignmentType.SLURRY,
+    assignmentType.value === AssignmentType.SLURRY ||
+    assignmentType.value === AssignmentType.DIGESTATE,
 )
-const valueVisible = computed(() => assignmentType.value === AssignmentType.SLURRY)
+const valueVisible = computed(() => assignmentType.value === AssignmentType.SLURRY || assignmentType.value === AssignmentType.DIGESTATE)
 
 const reset = () => {
   editAssignment.value = new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.OTHER, 0)
@@ -143,39 +149,28 @@ const save = () => {
     <h3>Quelle type d'affectation?</h3>
     <div class="mt-3 row">
       <div class="col-md-3 p-1 text-center">
-        <button
-          type="button"
-          class="btn btn-primary btn-lg container-fluid"
-          @click="setType(AssignmentType.CULTURE)"
-        >
+        <button type="button" class="btn btn-primary btn-lg container-fluid" @click="setType(AssignmentType.CULTURE)">
           CULTURE
         </button>
       </div>
       <div class="col-md-3 p-1 text-center">
-        <button
-          type="button"
-          class="btn btn-primary btn-lg container-fluid"
-          @click="setType(AssignmentType.METHA)"
-        >
+        <button type="button" class="btn btn-primary btn-lg container-fluid" @click="setType(AssignmentType.METHA)">
           METHA
         </button>
       </div>
       <div class="col-md-3 p-1 text-center">
-        <button
-          type="button"
-          class="btn btn-primary btn-lg container-fluid"
-          @click="setType(AssignmentType.OTHER)"
-        >
+        <button type="button" class="btn btn-primary btn-lg container-fluid" @click="setType(AssignmentType.OTHER)">
           AUTRE
         </button>
       </div>
       <div class="col-md-3 p-1 text-center">
-        <button
-          type="button"
-          class="btn btn-primary btn-lg container-fluid"
-          @click="setType(AssignmentType.SLURRY)"
-        >
-          LISIER / DIGESTAT
+        <button type="button" class="btn btn-primary btn-lg container-fluid" @click="setType(AssignmentType.SLURRY)">
+          LISIER
+        </button>
+      </div>
+      <div class="col-md-3 p-1 text-center">
+        <button type="button" class="btn btn-primary btn-lg container-fluid" @click="setType(AssignmentType.DIGESTATE)">
+          DIGESTAT
         </button>
       </div>
     </div>
@@ -198,7 +193,8 @@ const save = () => {
     </div>
     <div v-if="plotVisible" class="mb-3">
       <label for="selectPlot" class="form-label">Parcelle</label>
-      <select class="form-control" id="selectPlot" @change="setPlot($event.target)" :disabled="selectFarm === undefined">
+      <select class="form-control" id="selectPlot" @change="setPlot($event.target)"
+        :disabled="selectFarm === undefined">
         <option value="0" selected disabled>--- Sélectionnez une parcelle ---</option>
         <option v-for="plot in plots.filter(p => p.idFarm === selectFarm?.id)" :key="plot.id" :value="plot.id">
           {{ plot.name }}
@@ -225,27 +221,13 @@ const save = () => {
     </div>
     <div v-if="timeVisible" class="mb-3">
       <label for="hours" class="form-label">Nombre d'heures</label>
-      <input
-        id="hours"
-        class="form-control"
-        type="number"
-        placeholder="0"
-        min="0"
-        :value="time"
-        @input="setHours($event.target)"
-      />
+      <input id="hours" class="form-control" type="number" placeholder="0" min="0" :value="time"
+        @input="setHours($event.target)" />
     </div>
     <div v-if="valueVisible" class="mb-3">
       <label for="rounds" class="form-label">Nombre de tours</label>
-      <input
-        id="rounds"
-        class="form-control"
-        type="number"
-        placeholder="0"
-        min="0"
-        :value="value"
-        @input="setRounds($event.target)"
-      />
+      <input id="rounds" class="form-control" type="number" placeholder="0" min="0" :value="value"
+        @input="setRounds($event.target)" />
     </div>
     <div>
       <button type="button" class="btn btn-primary" :disabled="!isValid" @click="save">
@@ -254,38 +236,20 @@ const save = () => {
     </div>
   </div>
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div
-      id="errorToast"
-      class="toast align-items-center text-bg-danger border-0"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
+    <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">Erreur lors l'ajout de l'affectation</div>
-        <button
-          type="button"
-          class="btn-close btn-close-white me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
       </div>
     </div>
-    <div
-      id="successToast"
-      class="toast align-items-center text-bg-success border-0"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
+    <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">Affectation bien ajoutée</div>
-        <button
-          type="button"
-          class="btn-close btn-close-white me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
       </div>
     </div>
   </div>

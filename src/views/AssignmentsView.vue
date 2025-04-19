@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import { useSettings } from '../store/settings'
-import Assignment from '@/utils/Assignment'
+import Assignment, { AssignmentType } from '@/utils/Assignment'
 import { Modal, Toast } from 'bootstrap'
 import type Confirm from '@/utils/Confirm'
 import LoadingModal from '@/components/LoadingModal.vue'
@@ -23,12 +23,14 @@ const confirm = ref({
 
 const getHumanReadableType = (type: string) => {
   switch (type) {
-    case 'CULTURE':
+    case AssignmentType.CULTURE:
       return 'Culture'
-    case 'METHA':
+    case AssignmentType.METHA:
       return 'Méthanisation'
-    case 'SLURRY':
+    case AssignmentType.SLURRY:
       return 'Lisier'
+    case AssignmentType.DIGESTATE:
+      return 'Digestat'
     case 'OTHER':
       return 'Autre'
     default:
