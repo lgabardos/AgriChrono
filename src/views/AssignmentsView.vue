@@ -88,6 +88,7 @@ const exportCSV = () => {
     'Tâche',
     "Nombre d'heures",
     'Nombre de tours',
+    'Commentaire',
   ].join(';')
   const csv = sorted.map((a) => {
     return [
@@ -98,6 +99,7 @@ const exportCSV = () => {
       a.task ? a.task.name : '',
       a.time.toFixed(2),
       a.value?.toFixed(0) ?? '',
+      a.comment ?? ''
     ].join(';')
   })
 
@@ -164,7 +166,7 @@ const exportWeb = (headers: string, data: string) => {
 
 <template>
   <LoadingModal />
-  <ConfirmModal :item="confirm" @confirm="confirmDialog" @close="() => {}" />
+  <ConfirmModal :item="confirm" @confirm="confirmDialog" @close="() => { }" />
   <div class="p-4 table-responsive">
     <button class="btn btn-primary" @click="exportCSV">
       <BIconFiletypeCsv class="me-2" />Exporter CSV
@@ -179,20 +181,15 @@ const exportWeb = (headers: string, data: string) => {
           <th class="d-none d-sm-table-cell" scope="col">Tâche</th>
           <th class="d-none d-sm-table-cell" scope="col">Nombre d'heures</th>
           <th class="d-none d-sm-table-cell" scope="col">Nombre de tours</th>
+          <th class="d-none d-sm-table-cell" scope="col">Commentaire</th>
           <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
         <template v-for="a in assignments.sort((a, b) => (a.date < b.date ? 1 : -1))" :key="a.id">
           <tr class="align-middle">
-            <td
-              class="d-table-cell d-sm-none accordion-toggle collapsed text-center"
-              data-bs-toggle="collapse"
-              :href="'#expanded' + a.id"
-              role="button"
-              aria-expanded="false"
-              :aria-controls="'#expanded' + a.id"
-            >
+            <td class="d-table-cell d-sm-none accordion-toggle collapsed text-center" data-bs-toggle="collapse"
+              :href="'#expanded' + a.id" role="button" aria-expanded="false" :aria-controls="'#expanded' + a.id">
               <BIconChevronBarExpand />
             </td>
             <td>
@@ -205,6 +202,7 @@ const exportWeb = (headers: string, data: string) => {
             <td class="d-none d-sm-table-cell">{{ a.task ? a.task.name : '-' }}</td>
             <td class="d-none d-sm-table-cell">{{ a.time.toFixed(2) }}h</td>
             <td class="d-none d-sm-table-cell">{{ a.value?.toFixed(0) ?? '-' }}</td>
+            <td class="d-none d-sm-table-cell">{{ a.comment ?? '' }}</td>
             <td>
               <BIconTrash3 role="button" @click="confirmDeleteAssignment(a)"></BIconTrash3>
             </td>
@@ -212,11 +210,12 @@ const exportWeb = (headers: string, data: string) => {
           <tr>
             <td class="p-0" colspan="6">
               <div :id="'expanded' + a.id" class="collapse p-2">
-                Date: {{ dateFormatter().format(a.date) }}<br />
-                Type: {{ getHumanReadableType(a.type) }} <br />
-                Tâche: {{ a.task ? a.task.name : '-' }}<br />
-                Nombre d'heures: {{ a.time.toFixed(2) }}h<br />
-                Nombre de tours: {{ a.value?.toFixed(0) ?? '-' }}<br />
+                <b>Date:</b> {{ dateFormatter().format(a.date) }}<br />
+                <b>Type:</b> {{ getHumanReadableType(a.type) }} <br />
+                <b>Tâche:</b> {{ a.task ? a.task.name : '-' }}<br />
+                <b>Nombre d'heures:</b> {{ a.time.toFixed(2) }}h<br />
+                <b>Nombre de tours:</b> {{ a.value?.toFixed(0) ?? '-' }}<br />
+                <b>Commentaire:</b> {{ a.comment ?? '-' }}<br />
               </div>
             </td>
           </tr>
@@ -224,38 +223,20 @@ const exportWeb = (headers: string, data: string) => {
       </tbody>
     </table>
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
-      <div
-        id="errorToast"
-        class="toast align-items-center text-bg-danger border-0"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
+      <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive"
+        aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body">Erreur lors la suppression de l'affectation</div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+            aria-label="Close"></button>
         </div>
       </div>
-      <div
-        id="successToast"
-        class="toast align-items-center text-bg-success border-0"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
+      <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body">Affectation bien ajoutée</div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+            aria-label="Close"></button>
         </div>
       </div>
     </div>
