@@ -5,8 +5,12 @@ import HomeType from '@/components/HomeType.vue'
 
 const { assignments } = useSettings()
 
-const { culture, metha, other, slurry } = Assignment.buildDrivers(assignments.value)
-const { culture: culturePlot, slurry: slurryPlot } = Assignment.buildPlots(assignments.value)
+const { culture, metha, other, slurry, digestate } = Assignment.buildDrivers(assignments.value)
+const {
+  culture: culturePlot,
+  slurry: slurryPlot,
+  digestate: digestatePlot,
+} = Assignment.buildPlots(assignments.value)
 </script>
 
 <template>
@@ -88,7 +92,7 @@ const { culture: culturePlot, slurry: slurryPlot } = Assignment.buildPlots(assig
             aria-expanded="false"
             aria-controls="collapseSlurry"
           >
-            Lisier / Digestat
+            Lisier
           </button>
         </h2>
         <div
@@ -101,6 +105,35 @@ const { culture: culturePlot, slurry: slurryPlot } = Assignment.buildPlots(assig
               :driverPlotChooser="true"
               :values="slurry"
               :plotValues="slurryPlot.plotsAssignmentsDrivers"
+              :roundValues="true"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseDigestate"
+            aria-expanded="false"
+            aria-controls="collapseDigestate"
+          >
+            Digestat
+          </button>
+        </h2>
+        <div
+          id="collapseDigestate"
+          class="accordion-collapse collapse"
+          data-bs-parent="#homeAccordion"
+        >
+          <div class="accordion-body">
+            <HomeType
+              :driverPlotChooser="true"
+              :values="digestate"
+              :plotValues="digestatePlot.plotsAssignmentsDrivers"
+              :roundValues="true"
             />
           </div>
         </div>

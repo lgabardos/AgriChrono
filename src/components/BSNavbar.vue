@@ -31,7 +31,7 @@ const setActiveItem = () => {
 }
 const selectMenu = () => {
   const button = document.querySelector('#navbar-toggler:not(.collapsed)') as HTMLButtonElement
-  if (button) {
+  if (button && button.checkVisibility()) {
     button.click()
   }
 }

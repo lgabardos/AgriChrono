@@ -44,7 +44,11 @@ export default class Assignment {
 
         driverAssignments.forEach((da) => {
           let name = type.toString()
-          if (type === AssignmentType.CULTURE || type === AssignmentType.SLURRY) {
+          if (
+            type === AssignmentType.CULTURE ||
+            type === AssignmentType.SLURRY ||
+            type === AssignmentType.DIGESTATE
+          ) {
             const farm = farms.find((f) => f.id === da.plot?.idFarm)
             name = farm?.name + ' / ' + da.plot?.name
           }
@@ -57,7 +61,13 @@ export default class Assignment {
             if (existing.value && value) existing.value += value
           } else {
             result[idDriver].push(
-              new DriverAssignments(name, time, type === AssignmentType.SLURRY ? value : undefined),
+              new DriverAssignments(
+                name,
+                time,
+                type === AssignmentType.SLURRY || type === AssignmentType.DIGESTATE
+                  ? value
+                  : undefined,
+              ),
             )
           }
         })
@@ -68,6 +78,7 @@ export default class Assignment {
     return {
       culture: byType(AssignmentType.CULTURE),
       slurry: byType(AssignmentType.SLURRY),
+      digestate: byType(AssignmentType.DIGESTATE),
       metha: byType(AssignmentType.METHA),
       other: byType(AssignmentType.OTHER),
     }
@@ -76,7 +87,9 @@ export default class Assignment {
   static buildPlots(assignments: Assignment[]) {
     const farms = useSettings().farms.value
 
-    const byType = (type: AssignmentType.CULTURE | AssignmentType.SLURRY) => {
+    const byType = (
+      type: AssignmentType.CULTURE | AssignmentType.SLURRY | AssignmentType.DIGESTATE,
+    ) => {
       const assignmentsByType = assignments.filter((a) => a.type === type)
       const plots = [
         ...new Set(
@@ -109,7 +122,9 @@ export default class Assignment {
               new PlotAssignments(
                 driver.name,
                 time,
-                type === AssignmentType.SLURRY ? value : undefined,
+                type === AssignmentType.SLURRY || type === AssignmentType.DIGESTATE
+                  ? value
+                  : undefined,
               ),
             )
           }
@@ -131,6 +146,7 @@ export default class Assignment {
     return {
       culture: byType(AssignmentType.CULTURE),
       slurry: byType(AssignmentType.SLURRY),
+      digestate: byType(AssignmentType.DIGESTATE),
     }
   }
 }
