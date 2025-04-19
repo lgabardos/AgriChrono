@@ -14,7 +14,7 @@ const { farms, plots, tasks, drivers } = useSettings()
 
 const assignmentType = ref<string>()
 const editAssignment = ref(
-  new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.OTHER, 0),
+  new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.OTHER, 0, ''),
 )
 const selectFarm = ref<Farm>()
 const selectPlot = ref<Plot>()
@@ -22,6 +22,7 @@ const selectWorker = ref<Driver>()
 const selectTask = ref<Task>()
 const time = ref<number>(0)
 const value = ref<number>(0)
+const comment = ref<string>("")
 
 const setType = (type: AssignmentType) => {
   assignmentType.value = type
@@ -52,6 +53,9 @@ const setHours = (e: EventTarget | null) => {
 }
 const setRounds = (e: EventTarget | null) => {
   value.value = parseInt((e as HTMLInputElement).value)
+}
+const setComment = (e: EventTarget | null) => {
+  comment.value = (e as HTMLInputElement).value
 }
 
 const isValid = computed(() => {
@@ -94,14 +98,12 @@ const taskVisible = computed(() => assignmentType.value === AssignmentType.CULTU
 const timeVisible = computed(
   () =>
     assignmentType.value === AssignmentType.METHA ||
-    assignmentType.value === AssignmentType.OTHER ||
-    assignmentType.value === AssignmentType.SLURRY ||
-    assignmentType.value === AssignmentType.DIGESTATE,
+    assignmentType.value === AssignmentType.OTHER,
 )
 const valueVisible = computed(() => assignmentType.value === AssignmentType.SLURRY || assignmentType.value === AssignmentType.DIGESTATE)
 
 const reset = () => {
-  editAssignment.value = new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.OTHER, 0)
+  editAssignment.value = new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.OTHER, 0, '')
   selectPlot.value = undefined
   selectWorker.value = undefined
   selectTask.value = undefined
@@ -119,6 +121,7 @@ const save = () => {
   editAssignment.value.task = selectTask.value!
   editAssignment.value.time = time.value!
   editAssignment.value.value = value.value
+  editAssignment.value.comment = comment.value
 
   useSettings()
     .addAssignment(editAssignment.value)
@@ -228,6 +231,10 @@ const save = () => {
       <label for="rounds" class="form-label">Nombre de tours</label>
       <input id="rounds" class="form-control" type="number" placeholder="0" min="0" :value="value"
         @input="setRounds($event.target)" />
+    </div>
+    <div class="mb-3">
+      <label for="comment" class="form-label">Commentaire</label>
+      <textarea class="form-control" id="comment" @change="setComment($event.target)" />
     </div>
     <div>
       <button type="button" class="btn btn-primary" :disabled="!isValid" @click="save">
