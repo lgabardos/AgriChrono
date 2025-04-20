@@ -10,16 +10,33 @@ import { computed, onMounted, ref } from 'vue'
 import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { version as packageVersion } from '../../package.json'
+import { androidVersionChecker } from '@/composables/androidVersionChecker'
+import { InAppBrowser } from '@capacitor/inappbrowser'
 
 const isOnline = computed(() => useConnectivity().isOnline.value)
 
 const version = ref('')
+const downloadUrl = ref('')
 
 onMounted(() => {
   if (Capacitor.isNativePlatform()) {
     CapacitorApp.getInfo().then((info) => {
       version.value = `${info.version}`
     })
+    androidVersionChecker()
+      .check()
+      .then((hasUpdate) => {
+        if (hasUpdate) {
+          androidVersionChecker()
+            .getLatestAPK()
+            .then((url) => {
+              downloadUrl.value = url
+              const versionToast = document.getElementById('versionToast')
+              const toastBootstrap = Toast.getOrCreateInstance(versionToast!)
+              toastBootstrap.show()
+            })
+        }
+      })
   } else {
     version.value = packageVersion
   }
@@ -68,6 +85,12 @@ const checkCode = async (code: string) => {
       myModal.hide()
     })
 }
+
+const openDownloadUrl = () => {
+  InAppBrowser.openInExternalBrowser({
+    url: downloadUrl.value,
+  })
+}
 </script>
 <template>
   <LoadingModal />
@@ -108,6 +131,28 @@ const checkCode = async (code: string) => {
     >
       <div class="d-flex">
         <div id="error_message" class="toast-body">Code is incorrect.</div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+    <div
+      id="versionToast"
+      class="toast align-items-center text-white bg-primary border-0"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div class="d-flex">
+        <div class="toast-body">
+          Une nouvelle version est disponible,
+          <u @click="openDownloadUrl()">cliquez ici pour la télécharger.</u>
+        </div>
         <button
           type="button"
           class="btn-close btn-close-white me-2 m-auto"
