@@ -34,7 +34,7 @@ const emit = defineEmits<{
 
 const isNew = ref(true)
 const editAssignment = ref(
-  new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.CULTURE, 0),
+  new Assignment(0, new Driver(0, ''), new Date(), AssignmentType.CULTURE, 0, ''),
 )
 const selectWorker = ref(drivers.value[0])
 const selectTask = ref(tasks.value[0])
