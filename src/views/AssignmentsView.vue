@@ -213,8 +213,8 @@ const exportWeb = (headers: string, data: string) => {
               <BIconTrash3 role="button" @click="confirmDeleteAssignment(a)"></BIconTrash3>
             </td>
           </tr>
-          <tr>
-            <td class="p-0" colspan="6">
+          <tr class="d-sm-none">
+            <td class="p-0" colspan="7">
               <div :id="'expanded' + a.id" class="collapse p-2">
                 <b>Date:</b> {{ dateFormatter().format(a.date) }}<br />
                 <b>Type:</b> {{ getHumanReadableType(a.type) }} <br />

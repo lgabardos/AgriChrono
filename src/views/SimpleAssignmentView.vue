@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LoadingModal from '@/components/LoadingModal.vue'
+import { dateFormatter } from '@/composables/dateFormatter'
 import { useSettings } from '@/store/settings'
 import Assignment, { AssignmentType } from '@/utils/Assignment'
 import Driver from '@/utils/Driver'
@@ -21,6 +22,12 @@ const selectPlot = ref<Plot>()
 const selectWorker = ref<Driver>()
 const selectTask = ref<Task>()
 const time = ref<number>(0)
+
+const todayYMD = new Date().toISOString().split('T')[0]
+const day = ref<string>(todayYMD)
+const startHour = ref<string>(dateFormatter().format(new Date(), { timeStyle: 'short' }))
+const endHour = ref<string>(dateFormatter().format(new Date(), { timeStyle: 'short' }))
+
 const value = ref<number>(0)
 const comment = ref<string>('')
 
@@ -48,9 +55,38 @@ const setTask = (e: EventTarget | null) => {
     selectTask.value = task
   }
 }
-const setHours = (e: EventTarget | null) => {
-  time.value = parseFloat((e as HTMLInputElement).value)
+const setDay = (e: EventTarget | null) => {
+  day.value = (e as HTMLInputElement).value
 }
+const setStartHour = (e: EventTarget | null) => {
+  startHour.value = (e as HTMLInputElement).value
+  if (selectTask.value && selectPlot.value) {
+    const hours = selectTask.value.speed * selectPlot.value.area
+    const h = Math.trunc(hours)
+    const m = Math.abs(Math.round((hours - h) * 60))
+
+    const date = new Date(`${day.value}T${startHour.value}:00Z`)
+    date.setHours(date.getHours() + h)
+    date.setMinutes(date.getMinutes() + m)
+
+    endHour.value = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+
+    time.value = hours
+  }
+}
+const setEndHour = (e: EventTarget | null) => {
+  endHour.value = (e as HTMLInputElement).value
+
+  const [startHours, startMinutes] = startHour.value.split(':').map(Number)
+  const startDecimalMinutes = startMinutes / 60
+  const startTime = startHours + startDecimalMinutes
+  const [endHours, endMinutes] = endHour.value.split(':').map(Number)
+  const endDecimalMinutes = endMinutes / 60
+  const endTime = endHours + endDecimalMinutes
+
+  time.value = endTime - startTime
+}
+
 const setRounds = (e: EventTarget | null) => {
   value.value = parseInt((e as HTMLInputElement).value)
 }
@@ -97,7 +133,8 @@ const plotVisible = computed(
 const taskVisible = computed(() => assignmentType.value === AssignmentType.CULTURE)
 const timeVisible = computed(
   () =>
-    assignmentType.value === AssignmentType.METHA || assignmentType.value === AssignmentType.OTHER,
+    assignmentType.value !== AssignmentType.SLURRY &&
+    assignmentType.value !== AssignmentType.DIGESTATE,
 )
 const valueVisible = computed(
   () =>
@@ -120,12 +157,15 @@ const reset = () => {
   time.value = 0
   value.value = 0
   assignmentType.value = undefined
+  day.value = todayYMD
+  startHour.value = endHour.value = dateFormatter().format(new Date(), { timeStyle: 'short' })
 }
 
 const save = () => {
   const myModal = new Modal('#loadingModal', { keyboard: false })
   myModal.show()
 
+  editAssignment.value.date = new Date(`${day.value}T${startHour.value}:00Z`)
   editAssignment.value.plot = selectPlot.value!
   editAssignment.value.worker = selectWorker.value!
   editAssignment.value.task = selectTask.value!
@@ -261,16 +301,42 @@ const save = () => {
       </select>
     </div>
     <div v-if="timeVisible" class="mb-3">
-      <label for="hours" class="form-label">Nombre d'heures</label>
-      <input
-        id="hours"
-        class="form-control"
-        type="number"
-        placeholder="0"
-        min="0"
-        :value="time"
-        @input="setHours($event.target)"
-      />
+      <div class="mb-3">
+        <label for="day" class="form-label">Jour de l'intervention</label>
+        <input
+          id="day"
+          class="form-control"
+          type="date"
+          placeholder="dd/MM/yyyy"
+          :value="day"
+          :max="todayYMD"
+          @input="setDay($event.target)"
+        />
+      </div>
+      <div class="row gx-2">
+        <div class="col">
+          <label for="startHour">Heure de début</label>
+          <input
+            id="startHour"
+            class="form-control"
+            type="time"
+            placeholder="hh:mm"
+            :value="startHour"
+            @input="setStartHour($event.target)"
+          />
+        </div>
+        <div class="col">
+          <label for="endHour">Heure de fin</label>
+          <input
+            id="endHour"
+            class="form-control"
+            type="time"
+            placeholder="hh:mm"
+            :value="endHour"
+            @input="setEndHour($event.target)"
+          />
+        </div>
+      </div>
     </div>
     <div v-if="valueVisible" class="mb-3">
       <label for="rounds" class="form-label">Nombre de tours</label>
