@@ -6,9 +6,24 @@ import { useAuth } from '@/store/auth'
 import { useConnectivity } from '@/store/connectivity'
 import { useSettings } from '@/store/settings'
 import { Modal, Toast } from 'bootstrap'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { Capacitor } from '@capacitor/core'
+import { App as CapacitorApp } from '@capacitor/app'
+import { version as packageVersion } from '../../package.json'
 
 const isOnline = computed(() => useConnectivity().isOnline.value)
+
+const version = ref('')
+
+onMounted(() => {
+  if (Capacitor.isNativePlatform()) {
+    CapacitorApp.getInfo().then((info) => {
+      version.value = `${info.version}`
+    })
+  } else {
+    version.value = packageVersion
+  }
+})
 
 let codeModal: Modal
 const goToAdmin = () => {
@@ -57,7 +72,7 @@ const checkCode = async (code: string) => {
 <template>
   <LoadingModal />
   <EnterCodeModal @confirm="checkCode" />
-  <div class="container p-4">
+  <div class="flex-grow-1 container p-4">
     <div class="row">
       <div class="col-md-4 col-sm-0 p-1"></div>
       <div class="col-md-4 col-sm-12 p-1 text-center">
@@ -79,6 +94,9 @@ const checkCode = async (code: string) => {
       </div>
     </div>
   </div>
+  <p class="fs-6 text-muted text-center">
+    {{ version }}
+  </p>
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div
