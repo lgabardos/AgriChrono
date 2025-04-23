@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { useSettings } from './settings'
 import Constants from '@/utils/Constants'
+import { Preferences } from '@capacitor/preferences'
 
 const isOnline = ref<boolean>(navigator.onLine)
 const syncing = ref<boolean>(false)
@@ -18,10 +19,10 @@ const sync = async () => {
     }
   }
   // store locally
-  localStorage.setItem(
-    Constants.LOCAL_STORAGE_ASSIGNMENTS,
-    JSON.stringify(useSettings().assignmentsToSync.value),
-  )
+  Preferences.set({
+    key: Constants.LOCAL_STORAGE_ASSIGNMENTS,
+    value: JSON.stringify(useSettings().assignmentsToSync.value),
+  })
   syncing.value = false
   synced.value = true
   // hide the synced icon after 2 seconds
