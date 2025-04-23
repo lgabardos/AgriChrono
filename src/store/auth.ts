@@ -1,5 +1,6 @@
 import { useNetwork } from '@/composables/network'
 import Constants from '@/utils/Constants'
+import { CapacitorCookies } from '@capacitor/core'
 import { ref } from 'vue'
 
 const isAuthenticated = ref<boolean>(false)
@@ -13,7 +14,12 @@ const exit = () => {
 }
 
 const getXsrf = async () => {
-  return useNetwork().head(`${Constants.SERVER_URL}/api/xsrf`)
+  return useNetwork()
+    .get(`${Constants.SERVER_URL}/api/xsrf`)
+    .then((data) => {
+      CapacitorCookies.setCookie({ key: Constants.XSRF_TOKEN, value: data.token })
+      return data
+    })
 }
 
 const checkCode = async (code: string) => {
