@@ -1,6 +1,6 @@
 {
-  "name": "heure-champs",
-  "version": "1.4.1",
+  "name": "agri-chrono",
+  "version": "1.4.2",
   "private": true,
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",
