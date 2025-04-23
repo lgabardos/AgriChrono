@@ -9,6 +9,7 @@ import type Driver from '@/utils/Driver'
 import { useAuth } from './auth'
 import type Setting from '@/utils/Setting'
 import { useConnectivity } from './connectivity'
+import { Preferences } from '@capacitor/preferences'
 
 const drivers = ref<Driver[]>([])
 const farms = ref<Farm[]>([])
@@ -27,13 +28,15 @@ const loadSettings = async () => {
     tasks.value = settings.tasks
     assignments.value = settings.assignments ?? []
 
-    localStorage.setItem(Constants.LOCAL_STORAGE_SETTINGS, JSON.stringify(settings))
-  } else if (localStorage.getItem(Constants.LOCAL_STORAGE_SETTINGS) === null) {
+    Preferences.set({
+      key: Constants.LOCAL_STORAGE_SETTINGS,
+      value: JSON.stringify(settings),
+    })
+  } else if ((await Preferences.get({ key: Constants.LOCAL_STORAGE_SETTINGS })).value === null) {
     throw new Error('No settings found')
   } else {
-    const settings = JSON.parse(
-      localStorage.getItem(Constants.LOCAL_STORAGE_SETTINGS) as string,
-    ) as Setting
+    const pref = await Preferences.get({ key: Constants.LOCAL_STORAGE_SETTINGS })
+    const settings = JSON.parse(pref.value as string) as Setting
     drivers.value = settings.drivers
     farms.value = settings.farms
     plots.value = settings.plots
