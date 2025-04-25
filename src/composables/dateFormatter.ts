@@ -8,7 +8,7 @@ class DateFormatter {
       timeStyle: 'short',
     },
   ) {
-    return Intl.DateTimeFormat(this.locale, format).format(new Date(date))
+    return new Intl.DateTimeFormat(this.locale, format).format(new Date(date))
   }
 }
 export const dateFormatter = () => new DateFormatter()
