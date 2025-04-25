@@ -16,3 +16,12 @@ jobs:
         run: npm install
       - name: Build to check errors
         run: npm run build
+      - name: Run unit tests
+        run: npm run test:coverage
+      - name: Coverage check
+        uses: devmasx/coverage-check-action@v1.2.0
+        with:
+          type: lcov
+          token: { { github.token } }
+          min_coverage: 10
+          result_path: coverage/lcov.info
