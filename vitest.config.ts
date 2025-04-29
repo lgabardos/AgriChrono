@@ -6,7 +6,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'jsdom',
-      include: ['src/**/*.test.ts'],
+      include: ['tests/**/*.test.ts'],
       coverage: {
         provider: 'istanbul',
         reporter: ['cobertura', 'lcov', 'text-summary'],

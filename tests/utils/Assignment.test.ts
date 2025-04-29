@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import Assignment, { AssignmentType } from './Assignment'
-import { useSettings } from '@/store/settings'
+import Assignment, { AssignmentType } from '../../src/utils/Assignment'
+import { useSettings } from '../../src/store/settings'
 
 afterEach(() => {
   vi.useRealTimers()

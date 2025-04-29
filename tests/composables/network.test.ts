@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest'
-import { useNetwork } from './network'
+import { useNetwork } from '../../src/composables/network'
 import { CapacitorCookies } from '@capacitor/core'
-import Constants from '@/utils/Constants'
+import Constants from '../../src/utils/Constants'
 
 test('head', async () => {
   const spyFetch = vi.spyOn(global, 'fetch').mockResolvedValue({} as Response)
@@ -53,6 +53,21 @@ test('post', async () => {
     },
     credentials: 'include',
     body: JSON.stringify({ fake: { data: 12 } }),
+  })
+})
+
+test('delete', async () => {
+  const spyFetch = vi.spyOn(global, 'fetch').mockResolvedValue({} as Response)
+
+  await useNetwork().delete('https://fake.url', 'fake-token')
+  expect(spyFetch).toHaveBeenCalledTimes(1)
+  expect(spyFetch).toHaveBeenNthCalledWith(1, 'https://fake.url', {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer fake-token',
+    },
+    method: 'delete',
+    credentials: 'include',
   })
 })
 

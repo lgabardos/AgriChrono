@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import Task from './Task'
+import Task from '../../src/utils/Task'
 
 test('Task initialization', () => {
   const task = Task.from({ id: 1, name: 'name', speed: 12.3 } as Task)

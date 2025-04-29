@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test, vi, type MockInstance } from 'vitest'
-import { dateFormatter } from './dateFormatter'
+import { dateFormatter } from '../../src/composables/dateFormatter'
 
 let navigatorSpy: MockInstance
 
