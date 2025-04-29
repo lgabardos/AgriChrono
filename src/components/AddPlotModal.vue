@@ -12,10 +12,10 @@ watch(
   () => {
     editPlot.value = Plot.from(props.plot)
     if (editPlot.value.id === 0) {
-      isNew.value = false
       editPlot.value.idFarm = farms.value[0].id
-    } else {
       isNew.value = true
+    } else {
+      isNew.value = false
     }
   },
 )
@@ -39,9 +39,11 @@ const setPlotArea = (e: EventTarget | null) => {
 }
 const save = () => {
   emit('save', editPlot.value)
+  editPlot.value = new Plot(0, '', farms.value[0].id, 0)
 }
 const close = () => {
   emit('close')
+  editPlot.value = new Plot(0, '', farms.value[0].id, 0)
 }
 </script>
 <template>
@@ -66,7 +68,7 @@ const close = () => {
               <option
                 v-for="farm in farms"
                 :key="farm.id"
-                :selected="plot.idFarm === farm.id"
+                :selected="editPlot.idFarm === farm.id"
                 :value="farm.id"
               >
                 {{ farm.name }}
@@ -80,7 +82,7 @@ const close = () => {
               class="form-control"
               id="plotName"
               placeholder="Nom de la parcelle"
-              :value="plot.name"
+              :value="editPlot.name"
               @input="setPlotName($event.target)"
             />
           </div>
@@ -91,7 +93,7 @@ const close = () => {
               class="form-control"
               id="plotArea"
               placeholder="Surface"
-              :value="plot.area"
+              :value="editPlot.area"
               @input="setPlotArea($event.target)"
             />
           </div>
@@ -101,7 +103,7 @@ const close = () => {
             Annuler
           </button>
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="save">
-            {{ editPlot.id === 0 ? 'Ajouter' : 'Modifier' }}
+            {{ isNew ? 'Ajouter' : 'Modifier' }}
           </button>
         </div>
       </div>

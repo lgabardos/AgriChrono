@@ -10,9 +10,9 @@ watch(
   () => {
     editTask.value = Task.from(props.task)
     if (editTask.value.id === 0) {
-      isNew.value = false
-    } else {
       isNew.value = true
+    } else {
+      isNew.value = false
     }
   },
 )
@@ -61,7 +61,7 @@ const close = () => {
               class="form-control"
               id="taskName"
               placeholder="Nom de la tâche"
-              :value="task.name"
+              :value="editTask.name"
               @input="setTaskName($event.target)"
             />
           </div>
@@ -72,7 +72,7 @@ const close = () => {
               class="form-control"
               id="taskSpeed"
               placeholder="Surface"
-              :value="task.speed"
+              :value="editTask.speed"
               @input="setTaskSpeed($event.target)"
             />
           </div>
@@ -82,7 +82,7 @@ const close = () => {
             Annuler
           </button>
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="save">
-            {{ editTask.id === 0 ? 'Ajouter' : 'Modifier' }}
+            {{ isNew ? 'Ajouter' : 'Modifier' }}
           </button>
         </div>
       </div>

@@ -24,6 +24,9 @@ test('mount component and close it', async () => {
         'plot 1': [new PlotAssignments('driver 1', 1), new PlotAssignments('driver 2', 2)],
         'plot 2': [new PlotAssignments('driver 2', 3), new PlotAssignments('driver 3', 4)],
       },
+      taskValues: {
+        'plot 1': [new PlotAssignments('task 1', 1)]
+      }
     },
   })
   expect(wrapper.findAll('.btn.btn-primary').length).toBe(2)
@@ -38,6 +41,12 @@ test('mount component and close it', async () => {
   expect(card1.findAll('tbody tr td')[0].text()).toBe('1.00h')
   expect(card1.findAll('tbody tr th')[1].text()).toBe('Assignment 2')
   expect(card1.findAll('tbody tr td')[1].text()).toBe('2.00h')
+  let card2 = wrapper.findAll('.card')[1]
+  expect(card2.findAll('thead tr th')[0].text()).toBe('driver 2')
+  expect(card2.findAll('thead tr th')[1].text()).toBe('3.00h')
+  expect(card2.findAll('tbody tr').length).toBe(1)
+  expect(card2.findAll('tbody tr th')[0].text()).toBe('Assignment 3')
+  expect(card2.findAll('tbody tr td')[0].text()).toBe('3.00h')
 
   await wrapper.findAll('.btn.btn-primary')[1].trigger('click')
   await nextTick()
@@ -48,15 +57,24 @@ test('mount component and close it', async () => {
   card1 = wrapper.findAll('.card')[0]
   expect(card1.findAll('thead tr th')[0].text()).toBe('plot 1')
   expect(card1.findAll('thead tr th')[1].text()).toBe('3.00h')
-  expect(card1.findAll('tbody tr').length).toBe(2)
+  expect(card1.findAll('tbody tr').length).toBe(3)
   expect(card1.findAll('tbody tr th')[0].text()).toBe('driver 1')
   expect(card1.findAll('tbody tr td')[0].text()).toBe('1.00h')
   expect(card1.findAll('tbody tr th')[1].text()).toBe('driver 2')
   expect(card1.findAll('tbody tr td')[1].text()).toBe('2.00h')
+  expect(card1.findAll('tbody tr th')[2].text()).toBe('task 1')
+  expect(card1.findAll('tbody tr td')[2].text()).toBe('1.00h')
+  card2 = wrapper.findAll('.card')[1]
+  expect(card2.findAll('thead tr th')[0].text()).toBe('plot 2')
+  expect(card2.findAll('thead tr th')[1].text()).toBe('7.00h')
+  expect(card2.findAll('tbody tr').length).toBe(2)
+  expect(card2.findAll('tbody tr th')[0].text()).toBe('driver 2')
+  expect(card2.findAll('tbody tr td')[0].text()).toBe('3.00h')
+  expect(card2.findAll('tbody tr th')[1].text()).toBe('driver 3')
+  expect(card2.findAll('tbody tr td')[1].text()).toBe('4.00h')
 
-  console.log(wrapper.html())
-  // expect(wrapper.find('#codeModalLabel').text()).toEqual('Veuillez saisir le code administrateur')
-  // await wrapper.find('.btn-close').trigger('click')
-
-  // expect(wrapper.emitted()).toHaveProperty('close')
+  await wrapper.findAll('.btn.btn-primary')[0].trigger('click')
+  await nextTick()
+  expect(wrapper.findAll('.btn.btn-primary')[0].classes()).contains('active')
+  expect(wrapper.findAll('.btn.btn-primary')[1].classes()).not.contains('active')
 })
