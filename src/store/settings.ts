@@ -60,10 +60,10 @@ const addAssignment = async (assignment: Assignment, allowOffline = true) => {
     assignment.id = assignmentsToSync.value.length + 1
     assignmentsToSync.value.push(assignment)
     // store locally
-    localStorage.setItem(
-      Constants.LOCAL_STORAGE_ASSIGNMENTS,
-      JSON.stringify(assignmentsToSync.value),
-    )
+    Preferences.set({
+      key: Constants.LOCAL_STORAGE_ASSIGNMENTS,
+      value: JSON.stringify(assignmentsToSync.value),
+    })
     return true
   }
   return false
@@ -97,14 +97,15 @@ const deleteAssignment = async (assignment: Assignment) => {
   return false
 }
 
-const loadAssignmentsToSync = () => {
-  if (localStorage.getItem(Constants.LOCAL_STORAGE_ASSIGNMENTS) === null) {
+const loadAssignmentsToSync = async () => {
+  const assignments = await Preferences.get({
+    key: Constants.LOCAL_STORAGE_ASSIGNMENTS,
+  })
+  if (assignments.value === null) {
     assignmentsToSync.value = []
     return
   }
-  assignmentsToSync.value = JSON.parse(
-    localStorage.getItem(Constants.LOCAL_STORAGE_ASSIGNMENTS) as string,
-  ) as Assignment[]
+  assignmentsToSync.value = JSON.parse(assignments.value) as Assignment[]
 }
 
 export const useSettings = () => {
