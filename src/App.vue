@@ -26,8 +26,9 @@ Network.addListener('networkStatusChange', (status) => {
 })
 Network.getStatus().then((status) => {
   useConnectivity().isOnline.value = status.connected
-  useSettings().loadAssignmentsToSync()
-  syncIfConnected()
+  useSettings().loadAssignmentsToSync().then(() => {
+    syncIfConnected()
+  })
 })
 
 const syncIfConnected = () => {
