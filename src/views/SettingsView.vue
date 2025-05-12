@@ -35,7 +35,6 @@ const addFarm = (farm: Farm) => {
     const index = farms.value.findIndex((f) => f.id === farm.id)
     farms.value[index] = farm
   }
-  console.log(farm)
   save()
 }
 const deleteFarm = (farm: Farm) => {
