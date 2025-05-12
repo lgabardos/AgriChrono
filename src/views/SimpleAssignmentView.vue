@@ -31,6 +31,8 @@ const endHour = ref<string>(dateFormatter().format(new Date(), { timeStyle: 'sho
 const value = ref<number>(0)
 const comment = ref<string>('')
 
+const saving = ref(false)
+
 const setType = (type: AssignmentType) => {
   assignmentType.value = type
   editAssignment.value.type = type
@@ -162,6 +164,7 @@ const reset = () => {
 }
 
 const save = () => {
+  saving.value = true
   const myModal = new Modal('#loadingModal', { keyboard: false })
   myModal.show()
 
@@ -193,6 +196,7 @@ const save = () => {
     })
     .finally(() => {
       myModal.hide()
+      saving.value = false
     })
 }
 </script>
@@ -355,7 +359,9 @@ const save = () => {
       <textarea class="form-control" id="comment" @change="setComment($event.target)" />
     </div>
     <div>
-      <button type="button" class="btn btn-primary" :disabled="!isValid" @click="save">
+      <button type="button" class="btn btn-primary" :disabled="!isValid || saving" @click="save">
+        <div v-if="saving" class="spinner-border spinner-border-sm" role="status">
+        </div>
         {{ editAssignment.id === 0 ? 'Ajouter' : 'Modifier' }}
       </button>
     </div>
