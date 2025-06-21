@@ -7,7 +7,7 @@ export default class Assignment {
   constructor(
     public id: number,
     public worker: Driver,
-    public date: Date,
+    public created_at: Date,
     public type: AssignmentType,
     public time: number,
     public comment: string,
@@ -16,11 +16,25 @@ export default class Assignment {
     public value?: number,
   ) {}
 
+  static toDb(assignment: Assignment) {
+    return {
+      // id: assignment.id,
+      // created_at: assignment.created_at,
+      idWorker: assignment.worker.id,
+      type: assignment.type,
+      time: assignment.time,
+      comment: assignment.comment,
+      idPlot: assignment.plot?.id,
+      idTask: assignment.task?.id,
+      value: assignment.value,
+    }
+  }
+
   static from(json: Assignment): Assignment {
     return new Assignment(
       json.id,
       json.worker,
-      new Date(json.date),
+      new Date(json.created_at),
       json.type,
       json.time,
       json.comment,

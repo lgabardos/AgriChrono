@@ -1,6 +1,9 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import Assignment, { AssignmentType } from '../../src/utils/Assignment'
 import { useSettings } from '../../src/store/settings'
+import Driver from '../../src/utils/Driver'
+import Plot from '../../src/utils/Plot'
+import Task from '../../src/utils/Task'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -12,7 +15,7 @@ test('Assignment initialization', () => {
   const assignment = Assignment.from({
     id: 1,
     comment: 'comment',
-    date: new Date(),
+    created_at: new Date(),
     time: 12,
     type: AssignmentType.CULTURE,
     worker: { id: 2, name: 'Test' },
@@ -22,7 +25,7 @@ test('Assignment initialization', () => {
   } as Assignment)
   expect(assignment.id).toBe(1)
   expect(assignment.comment).toBe('comment')
-  expect(assignment.date).toStrictEqual(new Date())
+  expect(assignment.created_at).toStrictEqual(new Date())
   expect(assignment.time).toBe(12)
   expect(assignment.type).toBe(AssignmentType.CULTURE)
   expect(assignment.worker.id).toBe(2)
@@ -52,20 +55,20 @@ test('build drivers for culture', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.CULTURE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 } as Plot,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.CULTURE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 } as Plot,
     },
   ]
   const result = Assignment.buildDrivers(assignments)
@@ -88,21 +91,21 @@ test('build drivers for slurry', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.SLURRY,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 } as Plot,
       value: 12,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.SLURRY,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 } as Plot,
       value: 2,
     },
   ]
@@ -127,21 +130,21 @@ test('build drivers for digestate', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.DIGESTATE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 3 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 3 } as Plot,
       value: 12,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.DIGESTATE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 3 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 3 } as Plot,
       value: 2,
     },
   ]
@@ -166,21 +169,21 @@ test('build drivers for metha', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.METHA,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 4 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 4 } as Plot,
       value: 12,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.METHA,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 4 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 4 } as Plot,
       value: 2,
     },
   ]
@@ -205,21 +208,21 @@ test('build drivers for other', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.OTHER,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 5 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 5 } as Plot,
       value: 12,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.OTHER,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 5 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 5 } as Plot,
       value: 2,
     },
   ]
@@ -244,23 +247,23 @@ test('Build plots culture', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.CULTURE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 },
-      task: { id: 4, name: 'task 1', speed: 0.5 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 } as Plot,
+      task: { id: 4, name: 'task 1', speed: 0.5 } as Task,
       value: 3,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.CULTURE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 },
-      task: { id: 4, name: 'task 1', speed: 0.5 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 1 } as Plot,
+      task: { id: 4, name: 'task 1', speed: 0.5 } as Task,
       value: 3,
     },
   ]
@@ -287,21 +290,21 @@ test('Build plots slurry', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.SLURRY,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 } as Plot,
       value: 12,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.SLURRY,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 } as Plot,
       value: 2,
     },
   ]
@@ -327,21 +330,21 @@ test('Build plots digestate', () => {
     {
       id: 1,
       comment: 'comment 1',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.DIGESTATE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 } as Plot,
       value: 12,
     },
     {
       id: 2,
       comment: 'comment 2',
-      date: new Date(),
+      created_at: new Date(),
       time: 1,
       type: AssignmentType.DIGESTATE,
-      worker: { id: 1, name: 'driver 1' },
-      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 },
+      worker: { id: 1, name: 'driver 1' } as Driver,
+      plot: { id: 3, name: 'plot', area: 12, idFarm: 2 } as Plot,
       value: 2,
     },
   ]

@@ -49,6 +49,8 @@ const goToAdmin = () => {
 }
 
 const gotToAffectation = () => {
+  const myModal = new Modal('#loadingModal', { keyboard: false })
+  myModal.show()
   useAuth().currentMode.value = 'assignments'
   useSettings()
     .loadSettings()
@@ -61,6 +63,9 @@ const gotToAffectation = () => {
       const toastBootstrap = Toast.getOrCreateInstance(errorToast!)
       toastBootstrap.show()
     })
+    .finally(() => {
+      myModal.hide()
+    })
 }
 
 const checkCode = async (code: string) => {
@@ -71,7 +76,7 @@ const checkCode = async (code: string) => {
     .checkCode(code)
     .then((response) => {
       if (response) {
-        useSettings()
+        return useSettings()
           .loadSettings()
           .then(() => {
             router.push('/')
@@ -82,6 +87,8 @@ const checkCode = async (code: string) => {
         const toastBootstrap = Toast.getOrCreateInstance(errorToast!)
         toastBootstrap.show()
       }
+    })
+    .finally(() => {
       myModal.hide()
     })
 }

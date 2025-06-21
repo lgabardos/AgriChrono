@@ -5,4 +5,6 @@ export default class Constants {
   static LOCAL_STORAGE_ASSIGNMENTS = 'assignments'
 
   static XSRF_TOKEN = 'XSRF-TOKEN'
+
+  static ADMIN_LOGIN = "admin@agrichrono.fr"
 }

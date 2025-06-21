@@ -35,7 +35,7 @@ const addFarm = (farm: Farm) => {
     const index = farms.value.findIndex((f) => f.id === farm.id)
     farms.value[index] = farm
   }
-  save()
+  save("add", 'farms', farm)
 }
 const deleteFarm = (farm: Farm) => {
   confirm.value.message = "Êtes-vous sûr de vouloir supprimer l'exploitation " + farm.name + ' ?'
@@ -58,7 +58,7 @@ const addDriver = (driver: Driver) => {
     const index = drivers.value.findIndex((d) => d.id === driver.id)
     drivers.value[index] = driver
   }
-  save()
+  save("add", 'drivers', driver)
 }
 const deleteDriver = (driver: Driver) => {
   confirm.value.message = 'Êtes-vous sûr de vouloir supprimer le chauffeur ' + driver.name + ' ?'
@@ -83,7 +83,7 @@ const addPlot = (plot: Plot) => {
     const index = plots.value.findIndex((p) => p.id === plot.id)
     plots.value[index] = plot
   }
-  save()
+  save("add", 'plots', plot)
 }
 const deletePlot = (plot: Plot) => {
   confirm.value.message = 'Êtes-vous sûr de vouloir supprimer la parcelle ' + plot.name + ' ?'
@@ -108,7 +108,7 @@ const addTask = (task: Task) => {
     const index = tasks.value.findIndex((t) => t.id === task.id)
     tasks.value[index] = task
   }
-  save()
+  save("add", "tasks", task)
 }
 const deleteTask = (task: Task) => {
   confirm.value.message = 'Êtes-vous sûr de vouloir supprimer la tâches ' + task.name + ' ?'
@@ -122,25 +122,24 @@ const deleteTask = (task: Task) => {
 const confirmDialog = (item: Confirm) => {
   if (item.action === 'deleteDriver') {
     drivers.value = drivers.value.filter((d) => d.id !== item.item.id)
-    save()
+    save("remove", "drivers", item.item)
   } else if (item.action === 'deleteFarm') {
     farms.value = farms.value.filter((f) => f.id !== item.item.id)
-    save()
+    save("remove", "farms", item.item)
   } else if (item.action === 'deletePlot') {
     plots.value = plots.value.filter((p) => p !== item.item)
-    save()
+    save("remove", "plots", item.item)
   } else if (item.action === 'deleteTask') {
     tasks.value = tasks.value.filter((t) => t !== item.item)
-    save()
+    save("remove", "tasks", item.item)
   }
 }
 
-const save = () => {
+const save = (action: "add" | "remove", type: "drivers" | "farms" | "plots" | "tasks", value: Driver | Farm | Task | Plot) => {
   const myModal = new Modal('#loadingModal', { keyboard: false })
   myModal.show()
 
-  useSettings()
-    .save()
+  useSettings()[action](type, value)
     .then((result) => {
       myModal.hide()
       if (result) {

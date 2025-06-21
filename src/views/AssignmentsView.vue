@@ -79,7 +79,7 @@ const confirmDialog = (item: Confirm) => {
 }
 
 const exportCSV = () => {
-  const sorted = assignments.value.sort((a, b) => (a.date < b.date ? 1 : -1))
+  const sorted = assignments.value.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
   const headers = [
     'Date',
     'Chauffeur',
@@ -92,7 +92,7 @@ const exportCSV = () => {
   ].join(';')
   const csv = sorted.map((a) => {
     return [
-      dateFormatter().format(a.date),
+      dateFormatter().format(a.created_at),
       a.worker.name,
       getHumanReadableType(a.type),
       a.plot ? getPlotName(a.plot) : '',
@@ -186,7 +186,7 @@ const exportWeb = (headers: string, data: string) => {
         </tr>
       </thead>
       <tbody>
-        <template v-for="a in assignments.sort((a, b) => (a.date < b.date ? 1 : -1))" :key="a.id">
+        <template v-for="a in assignments.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))" :key="a.id">
           <tr class="align-middle">
             <td
               class="d-table-cell d-sm-none accordion-toggle collapsed text-center"
@@ -216,7 +216,7 @@ const exportWeb = (headers: string, data: string) => {
           <tr class="d-sm-none">
             <td class="p-0" colspan="7">
               <div :id="'expanded' + a.id" class="collapse p-2">
-                <b>Date:</b> {{ dateFormatter().format(a.date) }}<br />
+                <b>Date:</b> {{ dateFormatter().format(a.created_at) }}<br />
                 <b>Type:</b> {{ getHumanReadableType(a.type) }} <br />
                 <b>Tâche:</b> {{ a.task ? a.task.name : '-' }}<br />
                 <b>Nombre d'heures:</b> {{ a.time.toFixed(2) }}h<br />

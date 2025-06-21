@@ -1,4 +1,5 @@
 export default class Task {
+  created_at: Date = new Date()
   constructor(
     public id: number,
     public name: string,

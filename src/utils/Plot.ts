@@ -3,6 +3,7 @@ export default class Plot {
   name: string
   idFarm: number
   area: number
+  created_at: Date = new Date()
 
   constructor(id: number, name: string, idFarm: number, area: number) {
     this.id = id

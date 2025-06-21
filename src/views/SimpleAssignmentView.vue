@@ -45,6 +45,7 @@ const setFarm = (e: EventTarget | null) => {
 const setPlot = (e: EventTarget | null) => {
   const idPlot = e ? parseInt((e as HTMLInputElement).value) : 0
   selectPlot.value = plots.value.find((d) => d.id === idPlot) ?? plots.value[0]
+  calculateEndHour()
 }
 
 const setWorker = (e: EventTarget | null) => {
@@ -55,6 +56,7 @@ const setTask = (e: EventTarget | null) => {
   const task = tasks.value.find((t) => t.id === parseInt((e as HTMLSelectElement).value))
   if (task) {
     selectTask.value = task
+    calculateEndHour()
   }
 }
 const setDay = (e: EventTarget | null) => {
@@ -62,6 +64,14 @@ const setDay = (e: EventTarget | null) => {
 }
 const setStartHour = (e: EventTarget | null) => {
   startHour.value = (e as HTMLInputElement).value
+  calculateEndHour()
+}
+const setEndHour = (e: EventTarget | null) => {
+  endHour.value = (e as HTMLInputElement).value
+  updateTime()
+}
+
+const calculateEndHour = () => {
   if (selectTask.value && selectPlot.value) {
     const hours = selectTask.value.speed * selectPlot.value.area
     const h = Math.trunc(hours)
@@ -72,13 +82,11 @@ const setStartHour = (e: EventTarget | null) => {
     date.setMinutes(date.getMinutes() + m)
 
     endHour.value = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-
-    time.value = hours
   }
+  updateTime()
 }
-const setEndHour = (e: EventTarget | null) => {
-  endHour.value = (e as HTMLInputElement).value
 
+const updateTime = () => {
   const [startHours, startMinutes] = startHour.value.split(':').map(Number)
   const startDecimalMinutes = startMinutes / 60
   const startTime = startHours + startDecimalMinutes
@@ -168,7 +176,7 @@ const save = () => {
   const myModal = new Modal('#loadingModal', { keyboard: false })
   myModal.show()
 
-  editAssignment.value.date = new Date(`${day.value}T${startHour.value}:00Z`)
+  editAssignment.value.created_at = new Date(`${day.value}T${startHour.value}:00Z`)
   editAssignment.value.plot = selectPlot.value!
   editAssignment.value.worker = selectWorker.value!
   editAssignment.value.task = selectTask.value!
@@ -360,8 +368,7 @@ const save = () => {
     </div>
     <div>
       <button type="button" class="btn btn-primary" :disabled="!isValid || saving" @click="save">
-        <div v-if="saving" class="spinner-border spinner-border-sm" role="status">
-        </div>
+        <div v-if="saving" class="spinner-border spinner-border-sm" role="status"></div>
         {{ editAssignment.id === 0 ? 'Ajouter' : 'Modifier' }}
       </button>
     </div>
